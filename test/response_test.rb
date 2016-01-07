@@ -337,6 +337,30 @@ class RubySamlTest < Test::Unit::TestCase
         end
 
       end
+
+      context "#multiple attribute statements" do
+        should "extract attribute values from any statement" do
+          response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+          assert_equal "extra", response.attributes["extra_value"]
+          assert_equal "another", response.attributes["another_extra_value"]
+        end
+
+        should "extract attribute values from any statement" do
+          response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+          assert_equal "extra", response.attributes["extra_value"]
+          assert_equal "another", response.attributes["another_extra_value"]
+        end
+
+        should "return first of multiple values when value present in multiple attribute statements" do
+          response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+          assert_equal "demo", response.attributes["uid"]
+        end
+
+        should "return array with all attributes from all attribute statements when asked in XML order" do
+          response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+          assert_equal ["demo", "uid_from_second_statement"], response.attributes.multi(:uid)
+        end
+      end
     end
 
     context "#session_expires_at" do
