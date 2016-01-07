@@ -39,6 +39,7 @@ class RubySamlTest < Minitest::Test
     let(:response_invalid_subjectconfirmation_noa) { OneLogin::RubySaml::Response.new(read_invalid_response("invalid_subjectconfirmation_noa.xml.base64")) }
     let(:response_invalid_signature_position) { OneLogin::RubySaml::Response.new(read_invalid_response("invalid_signature_position.xml.base64")) }
     let(:response_encrypted_nameid) { OneLogin::RubySaml::Response.new(response_document_encrypted_nameid) }
+    let(:response_with_multiple_attribute_statements) { OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statements)) }
 
     it "raise an exception when response is initialized with nil" do
       assert_raises(ArgumentError) { OneLogin::RubySaml::Response.new(nil) }
@@ -903,6 +904,26 @@ class RubySamlTest < Minitest::Test
           OneLogin::RubySaml::Attributes.single_value_compatibility = true
         end
 
+      end
+
+      describe "#multiple attribute statements" do
+        it "extract attribute values from any statement" do
+          assert_equal "extra", response_with_multiple_attribute_statements.attributes["extra_value"]
+          assert_equal "another", response_with_multiple_attribute_statements.attributes["another_extra_value"]
+        end
+
+        it "extract attribute values from any statement" do
+          assert_equal "extra", response_with_multiple_attribute_statements.attributes["extra_value"]
+          assert_equal "another", response_with_multiple_attribute_statements.attributes["another_extra_value"]
+        end
+
+        it "return first of multiple values when value present in multiple attribute statements" do
+          assert_equal "demo", response_with_multiple_attribute_statements.attributes["uid"]
+        end
+
+        it "return array with all attributes from all attribute statements when asked in XML order" do
+          assert_equal ["demo", "uid_from_second_statement"], response_with_multiple_attribute_statements.attributes.multi(:uid)
+        end
       end
     end
 
