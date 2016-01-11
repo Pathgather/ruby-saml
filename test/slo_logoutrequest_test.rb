@@ -2,7 +2,6 @@ require File.expand_path(File.join(File.dirname(__FILE__), "test_helper"))
 require 'logout_responses/logoutresponse_fixtures'
 
 require 'onelogin/ruby-saml/slo_logoutrequest'
-require 'timecop'
 
 class RubySamlTest < Minitest::Test
 
