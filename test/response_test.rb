@@ -668,7 +668,7 @@ class RubySamlTest < Minitest::Test
         assert !response.send(:validate_session_expiration)
         assert_includes response.errors, "The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response"
       end
-      
+
       it "returns true when the session has expired, but is still within the allowed_clock_drift" do
         drift = (Time.now - Time.parse("2010-11-19T21:57:37Z")) * 60 # seconds ago that this assertion expired
         drift += 10 # add a buffer of 10 seconds to make sure the test passes
@@ -734,7 +734,7 @@ class RubySamlTest < Minitest::Test
         settings.idp_cert = signature_1
         response_valid_signed_without_x509certificate.settings = settings
         assert !response_valid_signed_without_x509certificate.send(:validate_signature)
-        assert_includes response_valid_signed_without_x509certificate.errors, "Invalid Signature on SAML Response"        
+        assert_includes response_valid_signed_without_x509certificate.errors, "Invalid Signature on SAML Response"
       end
 
       it "return true when no X509Certificate and the cert provided at settings matches" do
@@ -929,6 +929,30 @@ class RubySamlTest < Minitest::Test
           OneLogin::RubySaml::Attributes.single_value_compatibility = true
         end
 
+      end
+    end
+
+    describe "#multiple attribute statements" do
+      it "extract attribute values from any statement" do
+        response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+        assert_equal "extra", response.attributes["extra_value"]
+        assert_equal "another", response.attributes["another_extra_value"]
+      end
+
+      it "extract attribute values from any statement" do
+        response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+        assert_equal "extra", response.attributes["extra_value"]
+        assert_equal "another", response.attributes["another_extra_value"]
+      end
+
+      it "return first of multiple values when value present in multiple attribute statements" do
+        response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+        assert_equal "demo", response.attributes["uid"]
+      end
+
+      it "return array with all attributes from all attribute statements when asked in XML order" do
+        response = OneLogin::RubySaml::Response.new(fixture(:response_with_multiple_attribute_statement))
+        assert_equal ["demo", "uid_from_second_statement"], response.attributes.multi(:uid)
       end
     end
 
