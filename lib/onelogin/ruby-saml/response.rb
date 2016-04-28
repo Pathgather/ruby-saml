@@ -469,7 +469,13 @@ module OneLogin
       def validate_audience
         return true if audiences.empty? || settings.issuer.nil? || settings.issuer.empty?
 
-        unless audiences.include? settings.issuer
+        valid_issuers = [settings.issuer]
+
+        if !settings.issuer.start_with?("https")
+          valid_issuers.push("https://#{settings.issuer}")
+        end
+
+        if (audiences & valid_issuers).empty?
           error_msg = "#{settings.issuer} is not a valid audience for this Response - Valid audiences: #{audiences.join(',')}"
           return append_error(error_msg)
         end
