@@ -471,6 +471,7 @@ module OneLogin
 
         valid_issuers = [settings.issuer]
 
+        # Allow the issuer to be set to a URL without a protocol
         if !settings.issuer.start_with?("https")
           valid_issuers.push("https://#{settings.issuer}")
         end

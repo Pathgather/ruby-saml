@@ -211,6 +211,14 @@ class RubySamlTest < Minitest::Test
           assert_includes response_valid_signed.errors, error_msg
         end
 
+        it "does not raise when the audience is missing the protocol" do
+          settings.idp_cert_fingerprint = ruby_saml_cert_fingerprint
+          settings.issuer = 'someone.example.com/audience'
+          response_valid_signed.settings = settings
+          response_valid_signed.soft = false
+          assert response_valid_signed.is_valid?
+        end
+
         it "raise when no ID present in the SAML Response" do
           settings.idp_cert_fingerprint = signature_fingerprint_1
           response_no_id.settings = settings
