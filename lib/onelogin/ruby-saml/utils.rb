@@ -36,12 +36,12 @@ module OneLogin
       # @param key [String] The original private key
       # @return [String] The formatted private key
       #
-      def self.format_private_key(key)
+      def self.format_private_key(key, is_rsa_key: nil)
         # don't try to format an encoded private key or if is empty
         return key if key.nil? || key.empty? || key.match(/\x0d/)
 
         # is this an rsa key?
-        rsa_key = key.match("RSA PRIVATE KEY")
+        rsa_key = is_rsa_key.nil? ? key.match("RSA PRIVATE KEY") : is_rsa_key
         key = key.gsub(/\-{5}\s?(BEGIN|END)( RSA)? PRIVATE KEY\s?\-{5}/, "")
         key = key.gsub(/[\n\r\s]/, "")
         key = key.scan(/.{1,64}/)

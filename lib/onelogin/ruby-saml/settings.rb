@@ -46,6 +46,7 @@ module OneLogin
       attr_accessor :force_authn
       attr_accessor :certificate
       attr_accessor :private_key
+      attr_accessor :is_rsa_key
       attr_accessor :authn_context
       attr_accessor :authn_context_comparison
       attr_accessor :authn_context_decl_ref
@@ -93,7 +94,7 @@ module OneLogin
       end
 
       # Setter for Single Logout Service Binding.
-      # 
+      #
       # (Currently we only support "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect")
       # @param url [String]
       #
@@ -136,8 +137,13 @@ module OneLogin
       #
       def get_sp_key
         return nil if private_key.nil? || private_key.empty?
-        
-        formated_private_key = OneLogin::RubySaml::Utils.format_private_key(private_key)
+
+        formated_private_key = if is_rsa_key.nil?
+                                 OneLogin::RubySaml::Utils.format_private_key(private_key)
+                               else
+                                 OneLogin::RubySaml::Utils.format_private_key(private_key, is_rsa_key: is_rsa_key)
+                               end
+
         OpenSSL::PKey::RSA.new(formated_private_key)
       end
 
